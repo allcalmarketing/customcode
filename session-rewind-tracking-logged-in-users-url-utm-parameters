@@ -20,12 +20,6 @@ function get_url_parameters() {
 function insertSessionRewindScript() {
 	
 	$url_params = get_url_parameters();
-	
-	 // Check if the URL parameters array is empty
-    if (empty($url_params)) {
-        // If it's empty, return early without executing the rest of the code
-        return;
-    }
 
 if (!empty($url_params)) {
     // Do something with the parameters
