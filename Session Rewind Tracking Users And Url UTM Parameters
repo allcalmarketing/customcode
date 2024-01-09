@@ -1,0 +1,87 @@
+function get_url_parameters() {
+    // Initialize an array to store our parameters
+    $params = array();
+
+    // Define the parameters you expect
+    $expected_params = ['utm_source', 'utm_campaign', 'utm_medium', 'utm_term', 'utm_content'];
+
+    foreach ($expected_params as $param) {
+        // Check if each parameter is set and is not empty
+        if (isset($_GET[$param]) && !empty($_GET[$param])) {
+            // Sanitize the input to prevent security issues
+            $params[$param] = sanitize_text_field($_GET[$param]);
+        }
+    }
+
+    return $params;
+}
+
+
+function insertSessionRewindScript() {
+	
+	$url_params = get_url_parameters();
+	
+	 // Check if the URL parameters array is empty
+    if (empty($url_params)) {
+        // If it's empty, return early without executing the rest of the code
+        return;
+    }
+
+if (!empty($url_params)) {
+    // Do something with the parameters
+    if (isset($url_params['utm_source'])) {
+       $utmSource = sanitize_text_field($_GET['utm_source']);
+    }
+	 if (isset($url_params['utm_medium'])) {
+       $utmMedium = sanitize_text_field($_GET['utm_medium']);
+    }
+    if (isset($url_params['utm_campaign'])) {
+         $utmCampaign = sanitize_text_field($_GET['utm_campaign']);
+    }
+	if (isset($url_params['utm_term'])) {
+         $utmTerm = sanitize_text_field($_GET['utm_term']);
+    }
+	if (isset($url_params['utm_content'])) {
+         $utmContent = sanitize_text_field($_GET['utm_content']);
+    }
+	
+	
+}
+
+    // Get current user info if logged in
+    if ( is_user_logged_in() ) {
+        $current_user = wp_get_current_user();
+        $userId = esc_js($current_user->user_email);
+        $userName = esc_js($current_user->display_name);
+    } else {
+        $userId = 'guest';
+        $userName = 'Guest';
+    }
+
+    // Echo out the script
+    echo '<script>
+        !function (o) {
+            var w = window;
+            w.SessionRewindConfig = o;
+            var f = document.createElement("script");
+            f.async = 1; f.crossOrigin = "anonymous";
+            f.src = "https://rec.sessionrewind.com/srloader.js";
+            var g = document.getElementsByTagName("head")[0];
+            g.insertBefore(f, g.firstChild);
+        }({
+            apiKey: "YOUR API KEY",
+            startRecording: true,
+            userInfo: {
+                userId: "' . $userId . '",
+                userName: "' . $userName . '",
+				Source: "' . $utmSource . '",
+				Medium: "' . $utmMedium . '",
+				Campaign: "' . $utmCampaign . '",
+				Term: "' . $utmTerm . '",
+				Content: "' . $utmContent . '"
+            },
+        });
+    </script>';
+}
+
+add_action('wp_footer', 'insertSessionRewindScript');
